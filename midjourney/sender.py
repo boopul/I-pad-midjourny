@@ -1,11 +1,8 @@
 import logging
 import re
-
 import requests
 
-
 url = "https://discord.com/api/v9/interactions"
-
 
 class Sender:
     def __init__(self, params, flags=None):
@@ -22,9 +19,10 @@ class Sender:
     def send(self, prompt) -> None:
         header = {"authorization": self.authorization}
 
+        # Modify the regular expression pattern to allow "-" and ":"
         prompt = prompt.replace("_", " ")
         prompt = " ".join(prompt.split())
-        prompt = re.sub(r"[^a-zA-Z0-9\s]+", "", prompt).lower()
+        prompt = re.sub(r"[^a-zA-Z0-9\s\-:]+", "", prompt).lower()
 
         payload = {
             "type": 2,
@@ -53,8 +51,6 @@ class Sender:
         while r.status_code != 204:
             logging.warning(f"Unable to send prompt. Trying again...")
 
-            r = requests.post(
-                "https://discord.com/api/v9/interactions", json=payload, headers=header
-            )
+            r = requests.post(url, json=payload, headers=header)
 
         logging.info(f'Prompt "{prompt}" successfully sent.')
